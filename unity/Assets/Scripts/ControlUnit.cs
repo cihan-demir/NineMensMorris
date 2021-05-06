@@ -22,7 +22,7 @@ public class ControlUnit : MonoBehaviour
     private List<Field> fields;
     public Button resetButton;
 
-    private static bool DEBUG = true;
+    private static bool DEBUG = false;
 
     public void Awake()
     {
