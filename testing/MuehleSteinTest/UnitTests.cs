@@ -142,13 +142,13 @@ namespace MuehleSteinTest
             board[22] = -1;
 
             Game game = new Game(board, false, true, Game.Phase.Jump);
-            Assert.IsFalse(game.isRemoveLegalMove(1));
-            Assert.IsFalse(game.isRemoveLegalMove(2));
-            Assert.IsFalse(game.isRemoveLegalMove(3));
-            Assert.IsFalse(game.isRemoveLegalMove(15));
+            Assert.IsFalse(game.IsRemoveLegalMove(1));
+            Assert.IsFalse(game.IsRemoveLegalMove(2));
+            Assert.IsFalse(game.IsRemoveLegalMove(3));
+            Assert.IsFalse(game.IsRemoveLegalMove(15));
 
 
-            Assert.IsTrue(game.isRemoveLegalMove(8));
+            Assert.IsTrue(game.IsRemoveLegalMove(8));
         }
 
         [Test]
@@ -231,26 +231,26 @@ namespace MuehleSteinTest
             Assert.Throws<IllegalMoveException>(() => game.MoveStone(10, 22));
             Assert.Throws<IllegalMoveException>(() => game.AddStone(22));
 
-            Assert.IsTrue(game.isRemoveLegalMove(2));
-            Assert.IsTrue(game.isRemoveLegalMove(4));
-            Assert.IsTrue(game.isRemoveLegalMove(6));
-            Assert.IsTrue(game.isRemoveLegalMove(8));
-            Assert.IsTrue(game.isRemoveLegalMove(10));
-            Assert.IsTrue(game.isRemoveLegalMove(12));
-            Assert.IsTrue(game.isRemoveLegalMove(14));
-            Assert.IsTrue(game.isRemoveLegalMove(16));
-            Assert.IsTrue(game.isRemoveLegalMove(18));
+            Assert.IsTrue(game.IsRemoveLegalMove(2));
+            Assert.IsTrue(game.IsRemoveLegalMove(4));
+            Assert.IsTrue(game.IsRemoveLegalMove(6));
+            Assert.IsTrue(game.IsRemoveLegalMove(8));
+            Assert.IsTrue(game.IsRemoveLegalMove(10));
+            Assert.IsTrue(game.IsRemoveLegalMove(12));
+            Assert.IsTrue(game.IsRemoveLegalMove(14));
+            Assert.IsTrue(game.IsRemoveLegalMove(16));
+            Assert.IsTrue(game.IsRemoveLegalMove(18));
 
-            Assert.IsFalse(game.isRemoveLegalMove(1));
-            Assert.IsFalse(game.isRemoveLegalMove(3));
-            Assert.IsFalse(game.isRemoveLegalMove(5));
-            Assert.IsFalse(game.isRemoveLegalMove(7));
-            Assert.IsFalse(game.isRemoveLegalMove(9));
-            Assert.IsFalse(game.isRemoveLegalMove(11));
-            Assert.IsFalse(game.isRemoveLegalMove(13));
-            Assert.IsFalse(game.isRemoveLegalMove(15));
-            Assert.IsFalse(game.isRemoveLegalMove(17));
-            Assert.IsFalse(game.isRemoveLegalMove(24));
+            Assert.IsFalse(game.IsRemoveLegalMove(1));
+            Assert.IsFalse(game.IsRemoveLegalMove(3));
+            Assert.IsFalse(game.IsRemoveLegalMove(5));
+            Assert.IsFalse(game.IsRemoveLegalMove(7));
+            Assert.IsFalse(game.IsRemoveLegalMove(9));
+            Assert.IsFalse(game.IsRemoveLegalMove(11));
+            Assert.IsFalse(game.IsRemoveLegalMove(13));
+            Assert.IsFalse(game.IsRemoveLegalMove(15));
+            Assert.IsFalse(game.IsRemoveLegalMove(17));
+            Assert.IsFalse(game.IsRemoveLegalMove(24));
 
             game.RemoveStone(2);
 

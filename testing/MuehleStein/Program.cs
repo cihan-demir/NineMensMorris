@@ -32,7 +32,7 @@ namespace MuehleStein
                     Thread.Sleep(10);
                 }
 
-                Console.WriteLine(game.getText());
+                Console.WriteLine(game.GetText());
             } catch 
             {
                 foreach (var k in moves.Keys) {

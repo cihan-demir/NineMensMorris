@@ -22,7 +22,7 @@ public class ControlUnit : MonoBehaviour
     private List<Field> fields;
     public Button resetButton;
 
-    private static bool DEBUG = false;
+    private static bool DEBUG = true;
 
     public void Awake()
     {
@@ -116,6 +116,7 @@ public class ControlUnit : MonoBehaviour
                         initStonesAndFields();
                         game.NextMove(from, to);
                         initBoard(game.GetBoard());
+                        updateText();
                     }                    
                 }                
             }
