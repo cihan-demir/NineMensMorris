@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.809.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MuehleStein", "MuehleStein\MuehleStein.csproj", "{7185EEBA-CF5E-488E-83D9-3AD58C0CD006}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MuehleSteinTest", "MuehleSteinTest\MuehleSteinTest.csproj", "{1862554F-12BA-4249-866C-2C844A4FB69F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7185EEBA-CF5E-488E-83D9-3AD58C0CD006}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7185EEBA-CF5E-488E-83D9-3AD58C0CD006}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7185EEBA-CF5E-488E-83D9-3AD58C0CD006}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7185EEBA-CF5E-488E-83D9-3AD58C0CD006}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1862554F-12BA-4249-866C-2C844A4FB69F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1862554F-12BA-4249-866C-2C844A4FB69F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1862554F-12BA-4249-866C-2C844A4FB69F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1862554F-12BA-4249-866C-2C844A4FB69F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F5BEFA5-D64C-4D9C-A53A-D246DE5174D3}
+	EndGlobalSection
+EndGlobal
