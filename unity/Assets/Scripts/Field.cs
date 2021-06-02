@@ -99,6 +99,14 @@ public class Field : MonoBehaviour, IDropHandler
         //DestroyItem();
     }
 
+    internal void ResetField()
+    {
+        if(currentStone != null) { 
+            Destroy(currentStone.gameObject);
+            currentStone = null;
+        }
+    }
+
     /// <summary>
     /// Updates my item
     /// </summary>

@@ -3,7 +3,6 @@ using TMPro;
 using System.Collections.Generic;
 using MuehleStein;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Linq;
 
 /// <summary>
@@ -15,6 +14,13 @@ public class ControlUnit : MonoBehaviour
 
     public GameObject statusText;
     public GameObject inputText;
+
+
+    public GameObject whiteStone;
+    public GameObject blackStone;
+    public GameObject whiteInitParent;
+    public GameObject blackInitParent;
+
     private string playerInput;
 
     private List<Stone> whiteStones;
@@ -252,8 +258,47 @@ public class ControlUnit : MonoBehaviour
     {
 
         Debug.Log("You have clicked the button!");
-        game = null;
-        Scene scene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(scene.name);
+        
+        foreach (Field field in fields)
+        {
+            field.ResetField();
+        }
+
+        
+        //reset white stones
+        foreach (Stone whiteStone in whiteStones)
+        {
+            if(whiteStone != null)
+            {
+                Destroy(whiteStone.gameObject);
+            }
+        }
+
+        foreach (Stone blackStone in blackStones)
+        {
+            if (blackStone != null)
+            {
+                Destroy(blackStone.gameObject);
+            }
+        }
+
+        for(int i = 0; i != 9; i++)
+        {
+            GameObject gameObject = Instantiate(whiteStone, new Vector3(i*30, 0), new Quaternion());
+            
+            gameObject.transform.parent = whiteInitParent.transform;
+            gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector3(i * 30, 0);
+        }
+
+        for (int i = 0; i != 9; i++)
+        {
+            GameObject gameObject = Instantiate(blackStone, new Vector3(i * 30, 0), new Quaternion());
+            gameObject.transform.parent = blackInitParent.transform;
+            gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector3(i * 30, 0);
+        }
+
+
+        game = new Game();
+        initStonesAndFields();
     }
 }

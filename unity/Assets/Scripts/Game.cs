@@ -166,6 +166,8 @@ namespace MuehleStein
                     }
                 }
             }
+
+
         }
 
         public void NextMove(int from, int to)
