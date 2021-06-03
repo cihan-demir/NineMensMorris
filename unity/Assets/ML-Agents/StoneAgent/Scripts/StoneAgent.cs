@@ -5,7 +5,8 @@ using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 
-enum State
+/*
+public enum State
 {
   Invalid = -1,
   PlaceStone = 0,
@@ -14,9 +15,21 @@ enum State
   MoveStone = 3,
   WaitForMove = 4,
 }
+*/
+
+//public enum Player
+//{
+//  White = 0,
+//  Black = 1
+//}
 
 public class StoneAgent : Agent
 {
+  //public Player Player;
+  //public State PlayState = State.WaitForMove;
+  public bool IsWhiteAgent;
+  public ControlUnit ControlUnit;
+
   void Start()
   {
         
@@ -30,6 +43,7 @@ public class StoneAgent : Agent
   /// </summary>
   public override void OnEpisodeBegin()
   {
+    //Debug.Log(gameObject.name + " OnEpisodeBegin");
     /*
     // If the Agent fell, zero its momentum
     if (this.transform.localPosition.y < 0)
@@ -44,6 +58,8 @@ public class StoneAgent : Agent
                                        0.5f,
                                        Random.value * 8 - 4);
     */
+    // For turn based game, we manually request the agent to make decision
+    //RequestDecision();
   }
 
   /// <summary>
@@ -57,18 +73,18 @@ public class StoneAgent : Agent
   /// <param name="sensor"></param>
   public override void CollectObservations(VectorSensor sensor)
   {
+    //Debug.LogError(gameObject.name + " CollectObservations");
     // TODO: Add those data for observation
-    // Board info
     // Total white stones
     // Total black stones
 
-    // Target and Agent positions
-    //sensor.AddObservation(Target.localPosition);
-    //sensor.AddObservation(this.transform.localPosition);
-
-    // Agent velocity
-    //sensor.AddObservation(rBody.velocity.x);
-    //sensor.AddObservation(rBody.velocity.z);
+    // Board data
+    var myg = ControlUnit.game.GetBoard();
+    //Debug.LogError("board size: " + myg.Length);
+    foreach (var val in myg)
+    {
+      sensor.AddOneHotObservation(val, 1);
+    }
   }
 
   /// <summary>
@@ -81,6 +97,39 @@ public class StoneAgent : Agent
   /// <param name="actionBuffers"></param>
   public override void OnActionReceived(ActionBuffers actionBuffers)
   {
+
+    if (actionBuffers.ContinuousActions.Length == 0)
+      return;
+    //Debug.LogError("OnActionReceived");
+    //Debug.LogError(actionBuffers.ContinuousActions);
+    //foreach(var d in actionBuffers.ContinuousActions)
+    //{
+    //  Debug.LogError(d);
+    //}
+    Vector3 input = Vector3.zero;
+    input.x = actionBuffers.ContinuousActions[0];
+    input.y = actionBuffers.ContinuousActions[1];
+    Debug.LogError(gameObject.name + ": " + input.ToString());
+    //Debug.LogError(gameObject.name + " OnActionReceived");
+
+    //GenerateInput(actionBuffers.DiscreteActions);
+    /*
+    if (ControlUnit.game.addStone == true)
+    {
+      AddReward(0.1f);
+      ControlUnit.game.addStone = false;
+    }
+    if (game.removeStone == true)
+    {
+      AddReward(0.3f);
+      game.removeStone = false;
+    }
+    if (game.el)
+    {
+      AddReward(-0.1f);
+      game.el = false;
+    }
+    */
     /*
     // Actions, size = 2
     Vector3 controlSignal = Vector3.zero;
@@ -105,4 +154,20 @@ public class StoneAgent : Agent
     }
     */
   }
+
+  public override void Heuristic(in ActionBuffers actionsOut)
+  {
+    //Debug.LogError(ControlUnit.game.isWhiteTurn);
+    if (ControlUnit.game.isWhiteTurn == IsWhiteAgent)
+    {
+      //Debug.LogError(gameObject.name + " Heuristic");
+      var act = actionsOut.ContinuousActions;
+      int from = Random.Range(0, 9);
+      int to = Random.Range(0, 9);
+      act[0] = from;
+      act[1] = to;
+      ControlUnit.Move(from, to);
+    }
+  }
+
 }

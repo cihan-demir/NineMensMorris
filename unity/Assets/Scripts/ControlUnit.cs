@@ -5,6 +5,7 @@ using MuehleStein;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using Unity.MLAgents;
 
 /// <summary>
 /// Example of control application for drag and drop events handle
@@ -19,12 +20,13 @@ public class ControlUnit : MonoBehaviour
   public List<Stone> WhiteStones;
   public List<Stone> BlackStones;
   public List<Field> Fields;
-
+  public Agent WhiteStone;
+  public Agent BlackStone;
 
   private static bool DEBUG = false;
   private string playerInput;
 
-  public void Awake()
+  private void Start()
   {
     if (game == null)
     {
@@ -48,6 +50,7 @@ public class ControlUnit : MonoBehaviour
 
       UpdateText();
     }
+    //WhiteStone.RequestDecision();
   }
 
   public void ResetGame()
@@ -131,6 +134,19 @@ public class ControlUnit : MonoBehaviour
     inputText.GetComponent<TextMeshProUGUI>().SetText(playerInput);
   }
 
+  public void Move(int from, int to)
+  {
+    var possibleMoves = game.GetPossibleMoves();
+    if (possibleMoves.ContainsKey(from) && possibleMoves[from].Contains(to))
+    {
+      ResetStoneViews();
+      ResetBoardView();
+      game.NextMove(from, to);
+      UpdateBoardView(game.GetBoard());
+      UpdateText();
+    }
+  }
+
   private void UpdateBoardView(int[] board)
   {
     for (int i = 1; i != board.Length; i++)
@@ -191,7 +207,7 @@ public class ControlUnit : MonoBehaviour
 
         if (game.IsLegalMove(fromPosition, toPosition))
         {
-          Stone.DROP_ON_FIELD = true;
+          Stone.DropOnField = true;
           if (desc.stone.CurrentField == null)
           {
             game.AddStone(toPosition);

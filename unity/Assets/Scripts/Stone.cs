@@ -3,14 +3,12 @@ using UnityEngine.EventSystems;
 
 public class Stone : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
+  public static Stone DraggingStone;
+  public static bool DropOnField = false;
+
   public bool WhiteStone = true;
-  private RectTransform rectTransform;
-  private CanvasGroup canvasGroup;
-
-  public static Stone DRAGING_STONE;
-  public static bool DROP_ON_FIELD = false;
-
-  private static Vector2 STARTING_DRAG_POSITION;
+  public RectTransform RectTransform;
+  public CanvasGroup CanvasGroup;
 
   private Field _currentField;
   public Field CurrentField
@@ -21,29 +19,27 @@ public class Stone : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     }
     set
     {
-      rectTransform.anchoredPosition = Vector3.zero;
+      RectTransform.anchoredPosition = Vector3.zero;
       _currentField = value;
     }
   }
 
-  private static Canvas canvas;
-  private static string canvasName = "TempCanvas";
-  private static int canvasSortOrder = 100;
+  private static Vector2 _startingDragPosition;
+  private Canvas _canvas;
+  private string _canvasName = "TempCanvas";
+  private int _canvasSortOrder = 100;
   private Transform _currentParent;
   private Transform _originalParentTransform;
   private Vector3 _originalPosition;
 
   private void Awake()
   {
-    rectTransform = GetComponent<RectTransform>();
-    canvasGroup = GetComponent<CanvasGroup>();
-
-    if (canvas == null)
+    if (_canvas == null)
     {
-      GameObject canvasObj = new GameObject(canvasName);
-      canvas = canvasObj.AddComponent<Canvas>();
-      canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-      canvas.sortingOrder = canvasSortOrder;
+      GameObject canvasObj = new GameObject(_canvasName);
+      _canvas = canvasObj.AddComponent<Canvas>();
+      _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+      _canvas.sortingOrder = _canvasSortOrder;
     }
     _originalParentTransform = transform.parent.transform;
     _originalPosition = transform.localPosition;
@@ -78,34 +74,34 @@ public class Stone : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
   {
     if (ControlUnit.game.isWhiteTurn == WhiteStone)
     {
-      canvasGroup.alpha = 0.6f;
-      canvasGroup.blocksRaycasts = false;
+      CanvasGroup.alpha = 0.6f;
+      CanvasGroup.blocksRaycasts = false;
 
       _currentParent = transform.parent;
-      transform.SetParent(canvas.transform);
+      transform.SetParent(_canvas.transform);
 
       //Debug.Log("OnBeginDrag starting position: " + rectTransform.position);
-      DRAGING_STONE = this;
-      STARTING_DRAG_POSITION = rectTransform.position;
+      DraggingStone = this;
+      _startingDragPosition = RectTransform.position;
     }
   }
 
   public void OnEndDrag(PointerEventData eventData)
   {
-    canvasGroup.alpha = 1f;
-    canvasGroup.blocksRaycasts = true;
+    CanvasGroup.alpha = 1f;
+    CanvasGroup.blocksRaycasts = true;
     if (ControlUnit.game.isWhiteTurn == WhiteStone)
     {
       //Debug.Log("OnEndDrag");
-      if (!DROP_ON_FIELD)
+      if (!DropOnField)
       {
         //Debug.Log("OnEndDrag Reset Position");
-        rectTransform.position = STARTING_DRAG_POSITION;
-        DRAGING_STONE = null;
+        RectTransform.position = _startingDragPosition;
+        DraggingStone = null;
         transform.SetParent(_currentParent);
       }
     }
-    DROP_ON_FIELD = false;
+    DropOnField = false;
   }
 
   public void OnDrag(PointerEventData eventData)
@@ -114,7 +110,7 @@ public class Stone : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     {
       //Debug.Log("OnDrag");
 
-      rectTransform.position = Input.mousePosition;
+      RectTransform.position = Input.mousePosition;
     }
   }
 }

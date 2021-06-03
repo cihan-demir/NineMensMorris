@@ -59,12 +59,12 @@ public class Field : MonoBehaviour, IDropHandler
     {
       Debug.Log(GetComponent<RectTransform>().anchoredPosition);
       eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
-      currentStone = Stone.DRAGING_STONE;
+      currentStone = Stone.DraggingStone;
 
       var desc = new DropEventDescriptor
       {
         destinationField = this,
-        stone = Stone.DRAGING_STONE,
+        stone = Stone.DraggingStone,
         triggerType = TriggerType.DropRequest
       };
 
