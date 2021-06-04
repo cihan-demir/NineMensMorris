@@ -12,7 +12,7 @@ using Unity.MLAgents;
 /// </summary>
 public class ControlUnit : MonoBehaviour
 {
-  public static Game Game;
+  public Game Game;
 
   public TextMeshProUGUI StatusDesc;
   public TextMeshProUGUI BoardDesc;

@@ -6,6 +6,7 @@ public class Stone : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
   public static Stone DraggingStone;
   public static bool DropOnField = false;
 
+  public ControlUnit ControlUnit;
   public bool WhiteStone = true;
   public RectTransform RectTransform;
   public CanvasGroup CanvasGroup;

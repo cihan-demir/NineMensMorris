@@ -22,6 +22,8 @@ public class Field : MonoBehaviour, IDropHandler
     public Stone stone;
   }
 
+  public ControlUnit ControlUnit;
+
   private bool hasPiece { get { return currentStone != null; } }
   public Stone currentStone { get; set; }
 

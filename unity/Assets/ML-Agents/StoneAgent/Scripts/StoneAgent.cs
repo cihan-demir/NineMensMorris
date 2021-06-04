@@ -68,7 +68,7 @@ public class StoneAgent : Agent
     input.x = actionBuffers.DiscreteActions[0];
     input.y = actionBuffers.DiscreteActions[1];
 
-    Debug.Log(gameObject.name + " OnActionReceived: " + input.x + " " + input.y);
+    //Debug.Log(gameObject.name + " OnActionReceived: " + input.x + " " + input.y);
     AddReward(ProcessStep((int)input.x, (int)input.y));
     
     if (ControlUnit.Game.GameEnded)
@@ -98,7 +98,7 @@ public class StoneAgent : Agent
       }
     }
   }
-  
+
   public override void Heuristic(in ActionBuffers actionsOut)
   {
     
@@ -127,7 +127,7 @@ public class StoneAgent : Agent
       }
     }
   }
-
+  
   private Vector2 GetValidRandomStep()
   {
     var possibleMoves = ControlUnit.Game.GetPossibleMoves();
