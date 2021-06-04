@@ -1,39 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 
-/*
-public enum State
-{
-  Invalid = -1,
-  PlaceStone = 0,
-  RemoveStone = 1,
-  JumpStone = 2,
-  MoveStone = 3,
-  WaitForMove = 4,
-}
-*/
-
-//public enum Player
-//{
-//  White = 0,
-//  Black = 1
-//}
-
 public class StoneAgent : Agent
 {
-  //public Player Player;
-  //public State PlayState = State.WaitForMove;
   public bool IsWhiteAgent;
   public ControlUnit ControlUnit;
-
-  void Start()
-  {
-        
-  }
 
   /// <summary>
   /// At the start of each episode, OnEpisodeBegin() is called to set-up the
@@ -43,23 +20,11 @@ public class StoneAgent : Agent
   /// </summary>
   public override void OnEpisodeBegin()
   {
-    //Debug.Log(gameObject.name + " OnEpisodeBegin");
-    /*
-    // If the Agent fell, zero its momentum
-    if (this.transform.localPosition.y < 0)
+    if (ControlUnit.Game.isWhiteTurn == IsWhiteAgent)
     {
-      this.rBody.angularVelocity = Vector3.zero;
-      this.rBody.velocity = Vector3.zero;
-      this.transform.localPosition = new Vector3(0, 0.5f, 0);
+      //Debug.LogError("Reset game");
+      ControlUnit.OnResetBtnDown();
     }
-
-    // Move the target to a new spot
-    Target.localPosition = new Vector3(Random.value * 8 - 4,
-                                       0.5f,
-                                       Random.value * 8 - 4);
-    */
-    // For turn based game, we manually request the agent to make decision
-    //RequestDecision();
   }
 
   /// <summary>
@@ -79,7 +44,7 @@ public class StoneAgent : Agent
     // Total black stones
 
     // Board data
-    var myg = ControlUnit.game.GetBoard();
+    var myg = ControlUnit.Game.GetBoard();
     //Debug.LogError("board size: " + myg.Length);
     foreach (var val in myg)
     {
@@ -100,73 +65,68 @@ public class StoneAgent : Agent
 
     if (actionBuffers.ContinuousActions.Length == 0)
       return;
-    //Debug.LogError("OnActionReceived");
-    //Debug.LogError(actionBuffers.ContinuousActions);
-    //foreach(var d in actionBuffers.ContinuousActions)
-    //{
-    //  Debug.LogError(d);
-    //}
     Vector3 input = Vector3.zero;
     input.x = actionBuffers.ContinuousActions[0];
     input.y = actionBuffers.ContinuousActions[1];
-    Debug.LogError(gameObject.name + ": " + input.ToString());
-    //Debug.LogError(gameObject.name + " OnActionReceived");
 
-    //GenerateInput(actionBuffers.DiscreteActions);
-    /*
-    if (ControlUnit.game.addStone == true)
+    if (ControlUnit.Game.GameEnded)
     {
-      AddReward(0.1f);
-      ControlUnit.game.addStone = false;
-    }
-    if (game.removeStone == true)
-    {
-      AddReward(0.3f);
-      game.removeStone = false;
-    }
-    if (game.el)
-    {
-      AddReward(-0.1f);
-      game.el = false;
-    }
-    */
-    /*
-    // Actions, size = 2
-    Vector3 controlSignal = Vector3.zero;
-    controlSignal.x = actionBuffers.ContinuousActions[0];
-    controlSignal.z = actionBuffers.ContinuousActions[1];
-    rBody.AddForce(controlSignal * forceMultiplier);
-
-    // Rewards
-    float distanceToTarget = Vector3.Distance(this.transform.localPosition, Target.localPosition);
-
-    // Reached target
-    if (distanceToTarget < 1.42f)
-    {
-      SetReward(1.0f);
+      if (ControlUnit.Game.isWhiteTurn == IsWhiteAgent)
+      {
+        // This agent lost the game
+        //Debug.Log(gameObject.name + " lost game");
+      }
+      else
+      {
+        Debug.Log(gameObject.name + " won the game");
+        SetReward(1.0f);
+      }
       EndEpisode();
     }
-
-    // Fell off platform
-    else if (this.transform.localPosition.y < 0)
+    else
     {
-      EndEpisode();
+      if (ControlUnit.Game.isWhiteTurn == IsWhiteAgent)
+      {
+        if (ControlUnit.Game.IsInRemoveStoneState)
+        {
+          //Debug.Log(gameObject.name + " can remove a stone!");
+          AddReward(0.1f);
+        }
+      }
     }
-    */
   }
 
   public override void Heuristic(in ActionBuffers actionsOut)
   {
-    //Debug.LogError(ControlUnit.game.isWhiteTurn);
-    if (ControlUnit.game.isWhiteTurn == IsWhiteAgent)
+
+    ProcessStep(actionsOut);    
+  }
+
+  private void ProcessStep(in ActionBuffers actionsOut)
+  {
+    if (ControlUnit.Game.isWhiteTurn == IsWhiteAgent && !ControlUnit.Game.GameEnded)
     {
-      //Debug.LogError(gameObject.name + " Heuristic");
-      var act = actionsOut.ContinuousActions;
-      int from = Random.Range(0, 9);
-      int to = Random.Range(0, 9);
-      act[0] = from;
-      act[1] = to;
-      ControlUnit.Move(from, to);
+      if (ControlUnit.Process)
+      {
+        //ControlUnit.Process = false;
+
+        var possibleMoves = ControlUnit.Game.GetPossibleMoves();
+        int fromKeyIndex = UnityEngine.Random.Range(0, possibleMoves.Count);
+        int toKeyIndex = UnityEngine.Random.Range(0, possibleMoves.ElementAt(fromKeyIndex).Value.Count);
+        int from = possibleMoves.ElementAt(fromKeyIndex).Key;
+        int to = possibleMoves.ElementAt(fromKeyIndex).Value.ElementAt(toKeyIndex);
+        //foreach (var kvp in possibleMoves)
+        //{
+        //  var data = String.Join(", ", kvp.Value.ToArray());
+        //  Debug.Log(kvp.Key + " -> " + data);
+        //}
+        //Debug.Log(from + " to: " + to);
+        var act = actionsOut.ContinuousActions;
+        act[0] = from;
+        act[1] = to;
+        ControlUnit.Move(from, to);
+      }
+
     }
   }
 

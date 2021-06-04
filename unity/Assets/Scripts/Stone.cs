@@ -24,6 +24,12 @@ public class Stone : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     }
   }
 
+
+  public bool IsOnBoard
+  {
+    get { return transform.parent != _originalParentTransform; }
+  }
+
   private static Vector2 _startingDragPosition;
   private Canvas _canvas;
   private string _canvasName = "TempCanvas";
@@ -47,23 +53,42 @@ public class Stone : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
 
   public void HideStone()
   {
-    gameObject.SetActive(false);
     transform.SetParent(_originalParentTransform);
     transform.localPosition = _originalPosition;
+    gameObject.SetActive(false);
   }
 
-  public void ResetStone()
+  public void UpdateStone(int fromFieldIndex, int toFieldIndex )
   {
+    //Debug.Log("OnPointerDown");
+    if (ControlUnit.Game.IsInRemoveStoneState && CurrentField != null)
+    {
+      var currentFieldIndex = int.Parse(CurrentField.name);
+      if (currentFieldIndex == toFieldIndex)
+      {
+        //Debug.Log("Hide this stone: " + gameObject.name);
+        HideStone();
+        CurrentField.currentStone = null;
+      }
+    }
+
+    ResetStone(false);
+  }
+
+  public void ResetStone(bool show = true)
+  {
+    //Debug.Log(gameObject.name + " Reset stone: " + show);
     CurrentField = null;
     transform.SetParent(_originalParentTransform);
     transform.localPosition = _originalPosition;
-    gameObject.SetActive(true);
+    if (show)
+      gameObject.SetActive(true);
   }
 
   public void OnPointerDown(PointerEventData eventData)
   {
     //Debug.Log("OnPointerDown");
-    if (ControlUnit.game.IsInRemoveStoneState && CurrentField != null && ControlUnit.game.IsRemoveLegalMove(int.Parse(CurrentField.name)))
+    if (ControlUnit.Game.IsInRemoveStoneState && CurrentField != null && ControlUnit.Game.IsRemoveLegalMove(int.Parse(CurrentField.name)))
     {
       //Debug.Log("OnPointDown RemoveItem");
       CurrentField.RemoveItem();
@@ -72,7 +97,7 @@ public class Stone : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
 
   public void OnBeginDrag(PointerEventData eventData)
   {
-    if (ControlUnit.game.isWhiteTurn == WhiteStone)
+    if (ControlUnit.Game.isWhiteTurn == WhiteStone)
     {
       CanvasGroup.alpha = 0.6f;
       CanvasGroup.blocksRaycasts = false;
@@ -90,7 +115,7 @@ public class Stone : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
   {
     CanvasGroup.alpha = 1f;
     CanvasGroup.blocksRaycasts = true;
-    if (ControlUnit.game.isWhiteTurn == WhiteStone)
+    if (ControlUnit.Game.isWhiteTurn == WhiteStone)
     {
       //Debug.Log("OnEndDrag");
       if (!DropOnField)
@@ -106,7 +131,7 @@ public class Stone : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
 
   public void OnDrag(PointerEventData eventData)
   {
-    if (ControlUnit.game.isWhiteTurn == WhiteStone)
+    if (ControlUnit.Game.isWhiteTurn == WhiteStone)
     {
       //Debug.Log("OnDrag");
 

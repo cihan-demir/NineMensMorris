@@ -502,6 +502,17 @@ namespace MuehleStein
 
     }
 
+    public string GetBoardAsString2()
+    {
+      return "" + board[1].ToSign(whiteStoneDesc:"w", blackStoneDesc:"b") + "-----" + board[2].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "-----" + board[3].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "" + "\n" +
+          "" + board[4].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "---" + board[5].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "---" + board[6].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "" + "\n" +
+          "" + board[7].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + " " + board[8].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + " " + board[9].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "" + "\n" +
+          "" + board[10].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + " " + board[11].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + " " + board[12].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "   " + board[13].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + " " + board[14].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + " " + board[15].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "" + "\n" +
+          "" + board[16].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + " " + board[17].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + " " + board[18].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "" + "\n" +
+          "" + board[19].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "---" + board[20].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "---" + board[21].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "" + "\n" +
+          "" + board[22].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "-----" + board[23].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "-----" + board[24].ToSign(whiteStoneDesc: "w", blackStoneDesc: "b") + "";
+    }
+
     public string GetBoardAsString()
     {
       return "" + board[1].ToSign() + "-----" + board[2].ToSign() + "-----" + board[3].ToSign() + "" + "\n" +
@@ -581,13 +592,13 @@ namespace MuehleStein
 
   public static class ExtensionMethods
   {
-    public static string ToSign(this int stoneValue)
+    public static string ToSign(this int stoneValue, string whiteStoneDesc = "x", string blackStoneDesc = "o")
     {
       if (stoneValue == 0)
       {
         return "0";
       }
-      return stoneValue == -1 ? "o" : "x";
+      return stoneValue == -1 ? blackStoneDesc : whiteStoneDesc;
     }
   }
 }

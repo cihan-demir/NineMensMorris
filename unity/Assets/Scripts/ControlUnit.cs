@@ -12,27 +12,29 @@ using Unity.MLAgents;
 /// </summary>
 public class ControlUnit : MonoBehaviour
 {
-  public static Game game;
+  public static Game Game;
 
-  public GameObject statusText;
-  public GameObject inputText;
+  public TextMeshProUGUI StatusDesc;
+  public TextMeshProUGUI BoardDesc;
+  public TextMeshProUGUI CommandInputText;
 
   public List<Stone> WhiteStones;
   public List<Stone> BlackStones;
   public List<Field> Fields;
   public Agent WhiteStone;
   public Agent BlackStone;
-
-  private static bool DEBUG = false;
+  public bool ShowBoardInfo = true;
+  public bool StartWithDebugBoardOn = false;
+  public bool Process = false;
   private string playerInput;
 
   private void Start()
   {
-    if (game == null)
+    if (Game == null)
     {
       ResetStoneViews();
       ResetBoardView();
-      if (DEBUG)
+      if (StartWithDebugBoardOn)
       {
         int[] board = new int[25];
         for (int i = 1; i != board.Length; i++)
@@ -40,7 +42,7 @@ public class ControlUnit : MonoBehaviour
           if (i < 19)
             board[i] = i % 2 == 1 ? 1 : -1;
         }
-        game = new Game(board, true, false, Game.Phase.Move);
+        Game = new Game(board, true, false, Game.Phase.Move);
         UpdateBoardView(board);
       }
       else
@@ -55,7 +57,7 @@ public class ControlUnit : MonoBehaviour
 
   public void ResetGame()
   {
-    game = new Game();
+    Game = new Game();
   }
 
   void Update()
@@ -109,7 +111,7 @@ public class ControlUnit : MonoBehaviour
     {
       playerInput += " ";
     }
-    else if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.KeypadEnter))
+    else if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
     {
       var input = playerInput.Split(' ');
       if (input.Length == 2)
@@ -117,34 +119,32 @@ public class ControlUnit : MonoBehaviour
         int from, to;
         if (int.TryParse(input[0], out from) && int.TryParse(input[1], out to))
         {
-          var possibleMoves = game.GetPossibleMoves();
+          var possibleMoves = Game.GetPossibleMoves();
           if (possibleMoves.ContainsKey(from) && possibleMoves[from].Contains(to))
           {
-            ResetStoneViews();
-            ResetBoardView();
-            game.NextMove(from, to);
-            UpdateBoardView(game.GetBoard());
-            UpdateText();
+            Move(from, to);
+          }
+          else
+          {
+            Debug.LogError("Cannot move from: " + from + " to: " + to);
           }
         }
       }
       playerInput = "";
     }
 
-    inputText.GetComponent<TextMeshProUGUI>().SetText(playerInput);
+    CommandInputText.SetText(playerInput);
   }
 
   public void Move(int from, int to)
   {
-    var possibleMoves = game.GetPossibleMoves();
-    if (possibleMoves.ContainsKey(from) && possibleMoves[from].Contains(to))
-    {
-      ResetStoneViews();
-      ResetBoardView();
-      game.NextMove(from, to);
-      UpdateBoardView(game.GetBoard());
-      UpdateText();
-    }
+    UpdateStoneView(from, to);
+    ResetBoardView();
+    Game.NextMove(from, to);
+    UpdateBoardView(Game.GetBoard());
+    UpdateText();
+    Game.PrintBoard();
+    
   }
 
   private void UpdateBoardView(int[] board)
@@ -153,14 +153,14 @@ public class ControlUnit : MonoBehaviour
     {
       if (board[i] == 1)
       {
-        Fields[i - 1].AddStone(WhiteStones[0]);
-        WhiteStones.RemoveAt(0);
+        var stone = WhiteStones.First(s => !s.IsOnBoard && s.gameObject.activeSelf);
+        Fields[i - 1].SetStone(stone);
       }
 
       if (board[i] == -1)
       {
-        Fields[i - 1].AddStone(BlackStones[0]);
-        BlackStones.RemoveAt(0);
+        var stone = BlackStones.First(s => !s.IsOnBoard && s.gameObject.activeSelf);
+        Fields[i - 1].SetStone(stone);
       }
     }
   }
@@ -168,6 +168,17 @@ public class ControlUnit : MonoBehaviour
   public void ResetBoardView()
   {
     Fields.ForEach(f => f.ResetField());
+  }
+
+  public void UpdateStoneView(int from, int to)
+  {
+    //Debug.Log("from " + from + " to: " + to);
+    //Debug.LogWarning(Fields.Single(f => f.gameObject.name == from.ToString()).gameObject.ToString());
+    //Debug.LogWarning(Fields.Single(f => f.gameObject.name == to.ToString()).gameObject.ToString());
+    //int fromIndex = int.Parse(Fields.Single(f => f.gameObject.name == from.ToString()).gameObject.ToString());
+    //int toIndex = int.Parse(Fields.Single(f => f.gameObject.name == to.ToString()).gameObject.ToString());
+    WhiteStones.ForEach(s => s.UpdateStone(from, to));
+    BlackStones.ForEach(s => s.UpdateStone(from, to));
   }
 
   public void ResetStoneViews()
@@ -178,8 +189,13 @@ public class ControlUnit : MonoBehaviour
 
   private void UpdateText()
   {
-    statusText.GetComponent<TextMeshProUGUI>().SetText(game.GetText());
-    Debug.Log(game.GetBoardAsString());
+    StatusDesc.SetText(Game.GetText());
+    if (ShowBoardInfo)
+      BoardDesc.SetText(Game.GetBoardAsString2());
+    else
+      BoardDesc.SetText("");
+    //Debug.Log(Game.GetText());
+    //Debug.Log(Game.GetBoardAsString());
   }
 
   /// <summary>
@@ -205,41 +221,41 @@ public class ControlUnit : MonoBehaviour
           fromPosition = int.Parse(desc.stone.CurrentField.name);
         }
 
-        if (game.IsLegalMove(fromPosition, toPosition))
+        if (Game.IsLegalMove(fromPosition, toPosition))
         {
           Stone.DropOnField = true;
           if (desc.stone.CurrentField == null)
           {
-            game.AddStone(toPosition);
+            Game.AddStone(toPosition);
           }
           else
           {
-            game.MoveStone(fromPosition, toPosition);
+            Game.MoveStone(fromPosition, toPosition);
 
             if (desc.stone.CurrentField != null)
             {
               desc.stone.CurrentField.StoneDropOffOnOtherField();
             }
           }
-          desc.destinationField.AddStone(desc.stone);
+          desc.destinationField.SetStone(desc.stone);
 
-          if (game.IsMuehle(toPosition))
+          if (Game.IsMuehle(toPosition))
           {
-            game.IsInRemoveStoneState = true;
+            Game.IsInRemoveStoneState = true;
           }
         }
 
         break;
       case Field.TriggerType.RemoveStone:
         Debug.Log("RemoveStone Request from field " + " " + " to " + desc.stone.CurrentField.name + " stone: " + desc.stone);
-        game.RemoveStone(int.Parse(desc.stone.CurrentField.name));
+        Game.RemoveStone(int.Parse(desc.stone.CurrentField.name));
         break;
 
       case Field.TriggerType.EndTurn:
         Debug.Log("EndTurn");
-        if (game.GameEnded)
+        if (Game.GameEnded)
         {
-          Debug.Log("Game ENDED, " + (game.GetText()));
+          Debug.Log("Game ENDED, " + (Game.GetText()));
         }
         break;
       default:

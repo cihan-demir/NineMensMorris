@@ -55,7 +55,7 @@ public class Field : MonoBehaviour, IDropHandler
   {
     //Debug.Log("OnDrop");
     UpdateMyItem();
-    if (eventData.pointerDrag != null && !hasPiece && !ControlUnit.game.GameEnded)
+    if (eventData.pointerDrag != null && !hasPiece && !ControlUnit.Game.GameEnded)
     {
       Debug.Log(GetComponent<RectTransform>().anchoredPosition);
       eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
@@ -73,7 +73,7 @@ public class Field : MonoBehaviour, IDropHandler
     }
   }
 
-  internal void AddStone(Stone stone)
+  internal void SetStone(Stone stone)
   {
     currentStone = stone;
     stone.transform.SetParent(transform);
