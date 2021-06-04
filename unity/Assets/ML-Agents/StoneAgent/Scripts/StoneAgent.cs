@@ -62,14 +62,13 @@ public class StoneAgent : Agent
   /// <param name="actionBuffers"></param>
   public override void OnActionReceived(ActionBuffers actionBuffers)
   {
-
-    Debug.Log(gameObject.name + " OnActionReceived: " + actionBuffers.ContinuousActions.Length);
-    if (actionBuffers.ContinuousActions.Length == 0)
+    if (actionBuffers.DiscreteActions.Length == 0)
       return;
     Vector2 input = Vector3.zero;
-    input.x = actionBuffers.ContinuousActions[0];
-    input.y = actionBuffers.ContinuousActions[1];
+    input.x = actionBuffers.DiscreteActions[0];
+    input.y = actionBuffers.DiscreteActions[1];
 
+    Debug.Log(gameObject.name + " OnActionReceived: " + input.x + " " + input.y);
     AddReward(ProcessStep((int)input.x, (int)input.y));
     
     if (ControlUnit.Game.GameEnded)
@@ -99,9 +98,10 @@ public class StoneAgent : Agent
       }
     }
   }
-
+  
   public override void Heuristic(in ActionBuffers actionsOut)
   {
+    
     // Randomly input values
     if (ControlUnit.Game.isWhiteTurn == IsWhiteAgent && !ControlUnit.Game.GameEnded)
     {
@@ -112,12 +112,12 @@ public class StoneAgent : Agent
           ControlUnit.Process = false;
         }
         //Debug.Log(gameObject.name);
-        var act = actionsOut.ContinuousActions;
+        var act = actionsOut.DiscreteActions;
         if (ControlUnit.UseValidInput)
         {
           var validInput = GetValidRandomStep();
-          act[0] = validInput.x;
-          act[1] = validInput.y;
+          act[0] = (int)validInput.x;
+          act[1] = (int)validInput.y;
         }
         else
         {
@@ -158,7 +158,7 @@ public class StoneAgent : Agent
       }
       else
       {
-        return -0.1f;
+        return -0.01f;
       }
     }
     return 0;

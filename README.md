@@ -8,3 +8,5 @@ https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Getting-Started.m
 # To Simulate the game
 > cd ml-agents-release_17
 > mlagents-learn config/ppo/PlayStone.yaml --run-id=PlayStone
+# To view the tensor map 
+> tensorboard --logdir results
