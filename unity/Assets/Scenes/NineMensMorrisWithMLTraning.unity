@@ -5614,6 +5614,8 @@ MonoBehaviour:
   ShowBoardInfo: 1
   StartWithDebugBoardOn: 0
   Process: 1
+  ShouldResetProcess: 0
+  UseValidInput: 0
 --- !u!222 &1539350835
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -26,6 +26,8 @@ public class ControlUnit : MonoBehaviour
   public bool ShowBoardInfo = true;
   public bool StartWithDebugBoardOn = false;
   public bool Process = false;
+  public bool ShouldResetProcess = false;
+  public bool UseValidInput = true;
   private string playerInput;
 
   private void Start()

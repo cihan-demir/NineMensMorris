@@ -63,12 +63,15 @@ public class StoneAgent : Agent
   public override void OnActionReceived(ActionBuffers actionBuffers)
   {
 
+    Debug.Log(gameObject.name + " OnActionReceived: " + actionBuffers.ContinuousActions.Length);
     if (actionBuffers.ContinuousActions.Length == 0)
       return;
-    Vector3 input = Vector3.zero;
+    Vector2 input = Vector3.zero;
     input.x = actionBuffers.ContinuousActions[0];
     input.y = actionBuffers.ContinuousActions[1];
 
+    AddReward(ProcessStep((int)input.x, (int)input.y));
+    
     if (ControlUnit.Game.GameEnded)
     {
       if (ControlUnit.Game.isWhiteTurn == IsWhiteAgent)
@@ -85,6 +88,7 @@ public class StoneAgent : Agent
     }
     else
     {
+
       if (ControlUnit.Game.isWhiteTurn == IsWhiteAgent)
       {
         if (ControlUnit.Game.IsInRemoveStoneState)
@@ -98,36 +102,65 @@ public class StoneAgent : Agent
 
   public override void Heuristic(in ActionBuffers actionsOut)
   {
-
-    ProcessStep(actionsOut);    
-  }
-
-  private void ProcessStep(in ActionBuffers actionsOut)
-  {
+    // Randomly input values
     if (ControlUnit.Game.isWhiteTurn == IsWhiteAgent && !ControlUnit.Game.GameEnded)
     {
       if (ControlUnit.Process)
       {
-        //ControlUnit.Process = false;
-
-        var possibleMoves = ControlUnit.Game.GetPossibleMoves();
-        int fromKeyIndex = UnityEngine.Random.Range(0, possibleMoves.Count);
-        int toKeyIndex = UnityEngine.Random.Range(0, possibleMoves.ElementAt(fromKeyIndex).Value.Count);
-        int from = possibleMoves.ElementAt(fromKeyIndex).Key;
-        int to = possibleMoves.ElementAt(fromKeyIndex).Value.ElementAt(toKeyIndex);
-        //foreach (var kvp in possibleMoves)
-        //{
-        //  var data = String.Join(", ", kvp.Value.ToArray());
-        //  Debug.Log(kvp.Key + " -> " + data);
-        //}
-        //Debug.Log(from + " to: " + to);
+        if (ControlUnit.ShouldResetProcess)
+        {
+          ControlUnit.Process = false;
+        }
+        //Debug.Log(gameObject.name);
         var act = actionsOut.ContinuousActions;
-        act[0] = from;
-        act[1] = to;
-        ControlUnit.Move(from, to);
+        if (ControlUnit.UseValidInput)
+        {
+          var validInput = GetValidRandomStep();
+          act[0] = validInput.x;
+          act[1] = validInput.y;
+        }
+        else
+        {
+          act[0] = UnityEngine.Random.Range(0, 25);
+          act[1] = UnityEngine.Random.Range(0, 25);
+        }   
       }
-
     }
   }
 
+  private Vector2 GetValidRandomStep()
+  {
+    var possibleMoves = ControlUnit.Game.GetPossibleMoves();
+    int fromKeyIndex = UnityEngine.Random.Range(0, possibleMoves.Count);
+    int toKeyIndex = UnityEngine.Random.Range(0, possibleMoves.ElementAt(fromKeyIndex).Value.Count);
+    int from = possibleMoves.ElementAt(fromKeyIndex).Key;
+    int to = possibleMoves.ElementAt(fromKeyIndex).Value.ElementAt(toKeyIndex);
+    //int from = possibleMoves.ElementAt(fromKeyIndex).Key;
+    //int to = possibleMoves.ElementAt(fromKeyIndex).Value.ElementAt(toKeyIndex);
+    //foreach (var kvp in possibleMoves)
+    //{
+    //  var data = String.Join(", ", kvp.Value.ToArray());
+    //  Debug.Log(kvp.Key + " -> " + data);
+    //}
+    return new Vector2(from, to);
+
+  }
+
+  private float ProcessStep(int from, int to)
+  {
+    if (ControlUnit.Game.isWhiteTurn == IsWhiteAgent && !ControlUnit.Game.GameEnded)
+    {
+      var possibleMoves = ControlUnit.Game.GetPossibleMoves();
+      if (possibleMoves.ContainsKey(from) && possibleMoves[from].Contains(to))
+      {
+        ControlUnit.Move(from, to);
+        return 0.1f;
+      }
+      else
+      {
+        return -0.1f;
+      }
+    }
+    return 0;
+  }
 }
