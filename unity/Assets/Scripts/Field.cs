@@ -6,125 +6,122 @@ using UnityEngine.UI;
 public class Field : MonoBehaviour, IDropHandler
 {
 
-    public enum TriggerType                                                 // Types of drag and drop events
+  public enum TriggerType                                                 // Types of drag and drop events
+  {
+    DropRequest,                                                        // Request for item drop from one cell to another
+    RemoveStone,                                                       // Drop event completed
+    ItemAdded,                                                          // Item manualy added into cell
+    ItemWillBeDestroyed,                                                 // Called just before item will be destroyed
+    EndTurn
+  }
+
+  public class DropEventDescriptor                                        // Info about item's drop event
+  {
+    public TriggerType triggerType;
+    public Field destinationField;
+    public Stone stone;
+  }
+
+  private bool hasPiece { get { return currentStone != null; } }
+  public Stone currentStone { get; set; }
+
+  private Boolean DEBUG = true;
+
+  public void ResetField()
+  {
+    //if (currentStone)
+    //{
+    //  currentStone.ResetStone();
+    //}
+      //Destroy(currentStone.gameObject);
+    currentStone = null;
+  }
+
+  public void Awake()
+  {
+    if (!DEBUG)
     {
-        DropRequest,                                                        // Request for item drop from one cell to another
-        RemoveStone,                                                       // Drop event completed
-        ItemAdded,                                                          // Item manualy added into cell
-        ItemWillBeDestroyed,                                                 // Called just before item will be destroyed
-        EndTurn
+      Image image = GetComponent<Image>();
+      image.color = new Color(0, 0, 0, 0);
     }
+  }
 
-    public class DropEventDescriptor                                        // Info about item's drop event
+  public void Start()
+  {
+    //Debug.Log("Start");
+  }
+
+  public void OnDrop(PointerEventData eventData)
+  {
+    //Debug.Log("OnDrop");
+    UpdateMyItem();
+    if (eventData.pointerDrag != null && !hasPiece && !ControlUnit.Game.GameEnded)
     {
-        public TriggerType triggerType;
-        public Field destinationField;
-        public Stone stone;
+      Debug.Log(GetComponent<RectTransform>().anchoredPosition);
+      eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
+      currentStone = Stone.DraggingStone;
+
+      var desc = new DropEventDescriptor
+      {
+        destinationField = this,
+        stone = Stone.DraggingStone,
+        triggerType = TriggerType.DropRequest
+      };
+
+
+      SendNotification(desc);
     }
+  }
 
-    private bool hasPiece { get { return currentStone != null;} }
-    public Stone currentStone { get; set; }
+  internal void SetStone(Stone stone)
+  {
+    currentStone = stone;
+    stone.transform.SetParent(transform);
+    stone.CurrentField = this;
+  }
 
-    //public Field field { get; set; }
+  internal void StoneDropOffOnOtherField()
+  {
+    currentStone = null;
+  }
 
-    private Boolean DEBUG = true;
+  internal void RemoveItem()
+  {
 
-
-    public void Awake()
+    SendNotification(new DropEventDescriptor
     {
-        if (!DEBUG)
-        {
-            Image image = GetComponent<Image>();
-            image.color = new Color(0, 0, 0, 0);
-        }
-    }
+      stone = currentStone,
+      triggerType = TriggerType.RemoveStone
+    });
+    //Debug.Log("calling destroy");
+    currentStone.HideStone();
+    currentStone = null;
 
-    public void Start()
+    SendNotification(new DropEventDescriptor
     {
-        Debug.Log("Start");
-    }
+      triggerType = TriggerType.EndTurn
+    });
 
+  }
 
+  /// <summary>
+  /// Updates my item
+  /// </summary>
+  public void UpdateMyItem()
+  {
+    currentStone = GetComponentInChildren<Stone>();
+  }
 
-    public void OnDrop(PointerEventData eventData)
+  /// <summary>
+  /// Send drag and drop information to application
+  /// </summary>
+  /// <param name="desc"> drag and drop event descriptor </param>
+  private void SendNotification(DropEventDescriptor desc)
+  {
+    if (desc != null)
     {
-        Debug.Log("OnDrop");
-        UpdateMyItem();
-        if (eventData.pointerDrag != null && !hasPiece && !ControlUnit.game.GameEnded) {            
-            Debug.Log(GetComponent<RectTransform>().anchoredPosition);
-            eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;          
-            currentStone = Stone.DRAGING_STONE;
-
-            var desc = new DropEventDescriptor {
-                destinationField = this,
-                stone = Stone.DRAGING_STONE,
-                triggerType = TriggerType.DropRequest
-            };
-
-
-            SendNotification(desc);
-        }
+      // Send message with DragAndDrop info to parents GameObjects
+      gameObject.SendMessageUpwards("OnSimpleDragAndDropEvent", desc, SendMessageOptions.DontRequireReceiver);
     }
-
-    internal void AddStone(Stone stone)
-    {
-        currentStone = stone;
-        stone.transform.SetParent(transform);        
-        stone.currentField = this;
-    }
-
-    internal void StoneDropOffOnOtherField()
-    {
-        currentStone = null;
-        //DestroyItem();
-    }
-
-    internal void RemoveItem()
-    {
-        
-        SendNotification(new DropEventDescriptor
-        {
-            stone = currentStone,
-            triggerType = TriggerType.RemoveStone
-        });
-        Debug.Log("calling destroy");
-        Destroy(currentStone.gameObject);
-        currentStone = null;
-
-        SendNotification(new DropEventDescriptor
-        {
-            triggerType = TriggerType.EndTurn
-        });
-
-        //DestroyItem();
-    }
-
-    internal void ResetField()
-    {
-        if(currentStone != null) { 
-            Destroy(currentStone.gameObject);
-            currentStone = null;
-        }
-    }
-
-    /// <summary>
-    /// Updates my item
-    /// </summary>
-    public void UpdateMyItem()
-    {
-        currentStone = GetComponentInChildren<Stone>();
-    }
-
-    /// <summary>
-    /// Send drag and drop information to application
-    /// </summary>
-    /// <param name="desc"> drag and drop event descriptor </param>
-    private void SendNotification(DropEventDescriptor desc)
-    {
-        if (desc != null)
-        {
-            // Send message with DragAndDrop info to parents GameObjects
-            gameObject.SendMessageUpwards("OnSimpleDragAndDropEvent", desc, SendMessageOptions.DontRequireReceiver);
-        }
-    }
+  }
 }
