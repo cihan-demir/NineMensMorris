@@ -154,11 +154,11 @@ public class StoneAgent : Agent
       if (possibleMoves.ContainsKey(from) && possibleMoves[from].Contains(to))
       {
         ControlUnit.Move(from, to);
-        return 0.1f;
+        return 0.01f;
       }
       else
       {
-        return -0.01f;
+        return -0.001f;
       }
     }
     return 0;
