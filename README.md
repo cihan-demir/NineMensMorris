@@ -1,8 +1,9 @@
 # Setup ML envirnment 
 https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Getting-Started.md
 
-# Activate virtual env
-> source venv/bin/activate
+# Install & Activate virtual env
+> Has to be installed seperately
+> https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Installation.md
 # Download packages
 > pip install -r requirements.txt
 # To Simulate the game
