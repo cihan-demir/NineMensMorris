@@ -2,7 +2,7 @@
 https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Getting-Started.md
 
 # Install & Activate virtual env
-> Has to be installed seperately
+> Has to be installed separately
 > https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Installation.md
 # Download packages
 > pip install -r requirements.txt
